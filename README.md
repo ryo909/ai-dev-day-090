@@ -1,42 +1,40 @@
-# ai-dev-exp-template
+# Day090 — ぐるぐる考え駐車場
 
-Vite-based single-page template for `ai-dev-day-XXX` repositories.
+> 寝る前の考えすぎを、今できること・明日置くこと・手放すことに停めるツールです。
+>
+> Complexity Tier: small
+>
+> Selected Components: none
+>
+> Family / Mechanic: worry_loop_parking / parking_lot_place
+>
+> Input -> Output: free_note_cards -> parking_map
+>
+> Audience Promise: 寝る前に扱う心配を一つに絞れる。
 
-## Required meta.json fields
+## 使い方
 
-- `day` (e.g. `Day001`)
-- `title`
-- `description`
-- `genre`
-- `theme`
-- `story_summary`
+このツールでできること
+寝る前の考えすぎを、今できること・明日置くこと・手放すことに停めるツールです。
 
-## Theme behavior
+こんな時に使います
+寝る前、頭の中で心配が回り続けて眠りに入りにくい時に使います。
 
-- `src/themes.js` defines 8 visual themes.
-- Runtime applies `meta.json.theme` using CSS variables.
-- Day repos should set `theme` with a day-seeded deterministic selector.
+使い方
+1. 項目を入れる
+2. 追加や編集をする
+3. 結果を見る
 
-## Component Packs (tiered build)
+## Story
 
-- Template reads `complexity_tier` / `selected_components` from `meta.json`.
-- `selected_components` is missing: runs as small tier baseline with all packs OFF.
-- Unknown component names are ignored safely.
-- Each pack can be toggled independently and app core flow still works.
+- [制作ストーリー](./STORY.md)
+- Complexity hint: Implement the locked brief with one clear hero interaction and keep the main screenshot readable.
+- Publish hook: 心配ごと、今できる小さな行動、期限、相手を入れると、今夜の1台だけが出口に出て残りは駐車枠に置ける。
 
-Supported packs:
+## Demo
 
-- `reason_panel`
-- `sample_inputs`
-- `local_storage`
-- `comparison_view`
-- `history_panel`
-- `export_suite`
-- `step_ui`
+🌐 [GitHub Pages](https://ryo909.github.io/ai-dev-day-090/)
 
-### Quality/Fallback integration
+---
 
-- Every pack root includes `data-quality-marker="<pack_name>"` for evaluator detection.
-- Runtime manifest is published to `window.__COMPONENT_PACKS__` and script node `#componentPackManifest`.
-- Static fallback manifest exists at `public/component-pack-manifest.json`.
-- Medium/Large can increase visual depth safely by selecting more packs without changing core logic.
+Day090 / #100日開発
