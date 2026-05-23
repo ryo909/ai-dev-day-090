@@ -1,5 +1,5 @@
 import './style.css';
-const PROFILE = {"day":"Day090","title":"Worry Parking Lot","display_name_ja":"ぐるぐる考え駐車場","one_sentence":"寝る前の考えすぎを、今できること・明日置くこと・手放すことに停めるツール","purpose_line_ja":"寝る前の考えすぎを、今できること・明日置くこと・手放すことに停めるツールです。","use_case_line_ja":"寝る前、頭の中で心配が回り続けて眠りに入りにくい時に使います。","how_it_works_line_ja":"今夜扱う1台と明日置く枠を見る。","core_action":"emotional_parking","family":"worry_loop_parking","mechanic":"parking_lot_place","input_style":"free_note_cards","output_style":"parking_map","output_label":"ここを見ればOKです","audience_promise":"寝る前に扱う心配を一つに絞れる。","publish_hook":"心配ごと、今できる小さな行動、期限、相手を入れると、今夜の1台だけが出口に出て残りは駐車枠に置ける。","engine":"brief_driven","interaction_archetype":"parking_lot_place","page_archetype":"parking_lot","ui_variant":"generic","intro_variant":"generic","interaction_model":"structured_multi_field","primary_layout":"two_column_workbench","result_presentation_style":"stacked_result_cards","palette_motif":"neutral slate / white","main_cta":"サンプルで試す","input_panel_title":"まず試す入力","sample_panel_title":"サンプルで試す","guide_panel_title":"使い方のコツ","hero_panel_label":"結果の見どころ","output_shape":"parking_lot","state_model":"parking_lot_place_state","core_loop":"free_note_cards -> parking_lot_place -> parking_map","component_pack":"parking_lot+parking_map","scaffold_id":"card_deck_board","single_shot_text_generator":false};
+const PROFILE = {"day":"Day090","title":"Worry Parking Lot","display_name_ja":"ぐるぐる考え駐車場","one_sentence":"寝る前の考えすぎを、今できること・明日置くこと・手放すことに停めるツール","purpose_line_ja":"寝る前の考えすぎを、今できること・明日置くこと・手放すことに停めるツールです。","use_case_line_ja":"寝る前、頭の中で心配が回り続けて眠りに入りにくい時に使います。","how_it_works_line_ja":"今夜扱う1台と明日置く枠を見る。","core_action":"emotional_parking","family":"worry_loop_parking","mechanic":"parking_lot_place","input_style":"free_note_cards","output_style":"parking_map","output_label":"ここを見ればOKです","audience_promise":"寝る前に扱う心配を一つに絞れる。","publish_hook":"心配ごと、今できる小さな行動、期限、相手を入れると、今夜の1台だけが出口に出て残りは駐車枠に置ける。","engine":"brief_driven","interaction_archetype":"parking_lot_place","page_archetype":"parking_lot","ui_variant":"worry-parking","intro_variant":"worry_parking_lot","interaction_model":"editable_worry_cards_to_parking_lot","primary_layout":"worry_note_editor_with_parking_map","result_presentation_style":"tonight_action_and_parked_worries","palette_motif":"心配駐車場ナイト","main_cta":"寝る前の心配で試す","input_panel_title":"心配と小さな一手を足す","sample_panel_title":"寝る前の頭の中で試す","guide_panel_title":"駐車場の見どころ","hero_panel_label":"今夜扱う一台","output_shape":"parking_lot","state_model":"parking_lot_place_state","core_loop":"free_note_cards -> parking_lot_place -> parking_map","component_pack":"parking_lot+parking_map","scaffold_id":"brief_canvas","single_shot_text_generator":false};
 const byId = (id) => document.getElementById(id);
 const state = {
   tokens: ['買う', '待つ', '比べる', '今週中'],
@@ -617,6 +617,226 @@ function setupBriefCanvas() {
 function setupBatch065BriefTool(root) {
   const name = PROFILE.display_name_ja || '';
   const configs = {
+    '洗濯逃げ窓コンパス': {
+      addLabel: '洗濯物を追加する',
+      sampleLabel: '外出前の洗濯で試す',
+      fields: [
+        { key: 'item', label: '洗濯物', placeholder: 'タオル' },
+        { key: 'dry', label: '乾きやすさ', placeholder: '早い / 普通 / 遅い' },
+        { key: 'returnAt', label: '帰宅予定', placeholder: '18:30' }
+      ],
+      sample: [
+        { item: 'バスタオル', dry: '遅い', returnAt: '19:00' },
+        { item: 'シャツ', dry: '普通', returnAt: '19:00' },
+        { item: '靴下', dry: '早い', returnAt: '19:00' }
+      ],
+      stat: (rows) => `${rows.filter((row) => /遅/.test(row.dry || '')).length}件注意`,
+      status: (rows) => [
+        { label: '外干し候補', value: `${rows.length}点` },
+        { label: '早めに切替', value: `${rows.filter((row) => /遅/.test(row.dry || '')).length}点` },
+        { label: '帰宅', value: rows[0]?.returnAt || '未入力' }
+      ],
+      render: (rows) => `<div class="shelf-board">
+        ${rows.map((row) => {
+          const slow = /遅/.test(row.dry || '');
+          const width = slow ? 44 : /早/.test(row.dry || '') ? 88 : 66;
+          return `<div class="shelf-row ${slow ? 'low' : ''}">
+            <div><strong>${escapeHtml(row.item || '洗濯物')}</strong><div class="subline">${escapeHtml(row.dry || '普通')} / 帰宅 ${escapeHtml(row.returnAt || '未入力')}</div></div>
+            <div class="shelf-bar"><span style="width:${width}%"></span></div>
+            <div><strong>${slow ? '部屋干しへ逃がす' : '外干しで様子見'}</strong></div>
+          </div>`;
+        }).join('')}
+      </div>`
+    },
+    '返信約束抜け棚': {
+      addLabel: '約束を追加する',
+      sampleLabel: '終業前チェックで試す',
+      fields: [
+        { key: 'person', label: '相手', placeholder: '佐藤さん' },
+        { key: 'promise', label: '約束したこと', placeholder: '見積もりを返す' },
+        { key: 'state', label: '状態', placeholder: '未返信 / 添付待ち / 確認中' }
+      ],
+      sample: [
+        { person: '佐藤さん', promise: '見積もりを返す', state: '未返信' },
+        { person: '田中さん', promise: 'PDFを添付する', state: '添付待ち' },
+        { person: '山本さん', promise: '日程を確認する', state: '確認中' }
+      ],
+      stat: (rows) => `${rows.filter((row) => /未|待/.test(row.state || '')).length}件`,
+      status: (rows) => [
+        { label: '今日返す', value: `${rows.filter((row) => /未/.test(row.state || '')).length}件` },
+        { label: '添付待ち', value: `${rows.filter((row) => /添付/.test(row.state || '')).length}件` },
+        { label: '相手', value: `${new Set(rows.map((row) => row.person).filter(Boolean)).size}人` }
+      ],
+      render: (rows) => `<div class="listing-grid">
+        ${rows.map((row) => {
+          const urgent = /未|添付|待/.test(row.state || '');
+          return `<div class="listing-card ${urgent ? 'item-card cut' : 'item-card keep'}">
+            <div class="badge hit">${escapeHtml(row.state || '状態')}</div>
+            <div class="listing-title">${escapeHtml(row.person || '相手')}</div>
+            <p>${escapeHtml(row.promise || '約束したこと')}</p>
+            <strong>${urgent ? '終業前に拾う' : '明日確認でOK'}</strong>
+          </div>`;
+        }).join('')}
+      </div>`
+    },
+    '修理買い替え境界線': {
+      addLabel: '候補を追加する',
+      sampleLabel: '壊れた家電で試す',
+      fields: [
+        { key: 'item', label: '壊れた物', placeholder: '掃除機' },
+        { key: 'repair', label: '修理額', placeholder: '9000' },
+        { key: 'replace', label: '買い替え額', placeholder: '24000' }
+      ],
+      sample: [
+        { item: '掃除機', repair: '9000', replace: '24000' },
+        { item: '炊飯器', repair: '18000', replace: '32000' },
+        { item: 'デスクライト', repair: '5000', replace: '6500' }
+      ],
+      stat: (rows) => `${rows.filter((row) => Number(row.repair || 0) < Number(row.replace || 0) * 0.55).length}修理`,
+      status: (rows) => [
+        { label: '修理寄り', value: `${rows.filter((row) => Number(row.repair || 0) < Number(row.replace || 0) * 0.55).length}件` },
+        { label: '買替寄り', value: `${rows.filter((row) => Number(row.repair || 0) >= Number(row.replace || 0) * 0.75).length}件` },
+        { label: '確認', value: `${rows.filter((row) => Number(row.repair || 0) >= Number(row.replace || 0) * 0.55 && Number(row.repair || 0) < Number(row.replace || 0) * 0.75).length}件` }
+      ],
+      render: (rows) => `<div class="assignment-grid">
+        ${rows.map((row) => {
+          const repair = Number(row.repair || 0);
+          const replace = Number(row.replace || 1);
+          const pct = Math.min(100, Math.round((repair / replace) * 100));
+          const buy = pct >= 75;
+          const check = pct >= 55 && pct < 75;
+          return `<div class="listing-card ${buy ? 'item-card cut' : 'item-card keep'}">
+            <div class="badge hit">${pct}%</div>
+            <div class="listing-title">${escapeHtml(row.item || '壊れた物')}</div>
+            <p>修理 ${repair.toLocaleString()}円 / 買い替え ${replace.toLocaleString()}円</p>
+            <div class="bar"><span style="width:${Math.max(8, pct)}%"></span></div>
+            <strong>${buy ? '買い替え側に寄る' : check ? '待ち日数を確認' : '修理を先に見る'}</strong>
+          </div>`;
+        }).join('')}
+      </div>`
+    },
+    'フリマ発送厚みゲージ': {
+      addLabel: '品物を追加する',
+      sampleLabel: 'フリマ発送で試す',
+      fields: [
+        { key: 'item', label: '品物', placeholder: 'Tシャツ' },
+        { key: 'thickness', label: '梱包後の厚みcm', placeholder: '2.5' },
+        { key: 'method', label: '候補レーン', placeholder: '3cmレーン' }
+      ],
+      sample: [
+        { item: 'Tシャツ', thickness: '2.4', method: '3cmレーン' },
+        { item: '文庫本', thickness: '2.8', method: '3cmレーン' },
+        { item: 'ニット', thickness: '4.2', method: '5cmレーン' }
+      ],
+      stat: (rows) => `${rows.filter((row) => Number(row.thickness || 0) <= Number((row.method || '').match(/\d+(\.\d+)?/)?.[0] || 3)).length}通過`,
+      status: (rows) => [
+        { label: '通過', value: `${rows.filter((row) => Number(row.thickness || 0) <= Number((row.method || '').match(/\d+(\.\d+)?/)?.[0] || 3)).length}点` },
+        { label: '超過注意', value: `${rows.filter((row) => Number(row.thickness || 0) > Number((row.method || '').match(/\d+(\.\d+)?/)?.[0] || 3)).length}点` },
+        { label: '品物', value: `${rows.length}点` }
+      ],
+      render: (rows) => `<div class="shelf-board">
+        ${rows.map((row) => {
+          const limit = Number((row.method || '').match(/\d+(\.\d+)?/)?.[0] || 3);
+          const thickness = Number(row.thickness || 0);
+          const over = thickness > limit;
+          const width = Math.min(100, Math.round((thickness / Math.max(1, limit)) * 100));
+          return `<div class="shelf-row ${over ? 'low' : ''}">
+            <div><strong>${escapeHtml(row.item || '品物')}</strong><div class="subline">${thickness}cm / ${escapeHtml(row.method || `${limit}cmレーン`)}</div></div>
+            <div class="shelf-bar"><span style="width:${Math.max(8, width)}%"></span></div>
+            <div><strong>${over ? '超過注意' : '通れそう'}</strong></div>
+          </div>`;
+        }).join('')}
+      </div>`
+    },
+    'ぐるぐる考え駐車場': {
+      addLabel: '心配を追加する',
+      sampleLabel: '寝る前の頭の中で試す',
+      fields: [
+        { key: 'worry', label: '心配', placeholder: '明日の連絡が不安' },
+        { key: 'action', label: '今できる一手', placeholder: 'メモだけ作る' },
+        { key: 'park', label: '置き場', placeholder: '今夜 / 明日 / 手放す' }
+      ],
+      sample: [
+        { worry: '明日の連絡が不安', action: '要点を3つメモする', park: '今夜' },
+        { worry: '週末の予定が未定', action: '明日の昼に確認', park: '明日' },
+        { worry: '相手の反応が読めない', action: '今は決めない', park: '手放す' }
+      ],
+      stat: (rows) => rows.find((row) => /今夜/.test(row.park || ''))?.action || '一手',
+      status: (rows) => [
+        { label: '今夜', value: `${rows.filter((row) => /今夜/.test(row.park || '')).length}台` },
+        { label: '明日', value: `${rows.filter((row) => /明日/.test(row.park || '')).length}台` },
+        { label: '手放す', value: `${rows.filter((row) => /手放/.test(row.park || '')).length}台` }
+      ],
+      render: (rows) => `<div class="listing-grid">
+        ${rows.map((row) => {
+          const tonight = /今夜/.test(row.park || '');
+          return `<div class="listing-card ${tonight ? 'item-card keep' : ''}">
+            <div class="badge hit">${escapeHtml(row.park || '置き場')}</div>
+            <div class="listing-title">${escapeHtml(row.worry || '心配')}</div>
+            <p>${escapeHtml(row.action || '小さな一手')}</p>
+            <strong>${tonight ? '出口に置く' : '駐車枠に停める'}</strong>
+          </div>`;
+        }).join('')}
+      </div>`
+    },
+    '小さな勝ちトロフィー': {
+      addLabel: '勝ちを追加する',
+      sampleLabel: '小さな達成で試す',
+      fields: [
+        { key: 'win', label: '今日やったこと', placeholder: '洗濯物を畳んだ' },
+        { key: 'hard', label: '地味に大変だった点', placeholder: '後回しにしなかった' },
+        { key: 'to', label: '見せたい相手', placeholder: '家族' }
+      ],
+      sample: [
+        { win: '洗濯物を畳んだ', hard: '後回しにしなかった', to: '家族' },
+        { win: '返信を3件返した', hard: '眠い時間に終えた', to: '友人' }
+      ],
+      stat: (rows) => `${rows.length}冠`,
+      status: (rows) => [
+        { label: 'トロフィー', value: `${rows.length}枚` },
+        { label: '送る相手', value: rows[0]?.to || '未入力' },
+        { label: '称号', value: rows[0]?.win ? '今日の一勝' : '準備中' }
+      ],
+      render: (rows) => `<div class="listing-grid">
+        ${rows.map((row) => `<div class="listing-card item-card keep">
+          <div class="badge hit">今日の一勝</div>
+          <div class="listing-title">${escapeHtml(row.win || '小さな勝ち')}</div>
+          <h2>小さな勝ちトロフィー</h2>
+          <p>${escapeHtml(row.hard || '地味に大変だった点')}</p>
+          <div class="subline">${escapeHtml(row.to || '見せたい相手')}に送れる一枚</div>
+        </div>`).join('')}
+      </div>`
+    },
+    '部屋シーン調合器': {
+      addLabel: '材料を追加する',
+      sampleLabel: '夜の部屋で試す',
+      fields: [
+        { key: 'purpose', label: '目的', placeholder: '読書' },
+        { key: 'resource', label: '使える物', placeholder: '小さな照明' },
+        { key: 'move', label: '3分の一手', placeholder: '机の上だけ空ける' }
+      ],
+      sample: [
+        { purpose: '読書', resource: '小さな照明', move: '机の上だけ空ける' },
+        { purpose: '映画', resource: '低めの音量', move: '飲み物を置く場所を作る' },
+        { purpose: '作業', resource: '白い照明', move: '通知を伏せる' }
+      ],
+      stat: (rows) => `${rows.length}配合`,
+      status: (rows) => [
+        { label: '目的', value: rows[0]?.purpose || '未入力' },
+        { label: '材料', value: `${rows.length}つ` },
+        { label: '時間', value: '3分' }
+      ],
+      render: (rows) => `<div class="path-list">
+        ${rows.map((row, idx) => `<div class="route-step">
+          <div class="route-name">${idx + 1}. ${escapeHtml(row.purpose || '目的')}</div>
+          <small>${escapeHtml(row.resource || '使える物')} / ${escapeHtml(row.move || '3分の一手')}</small>
+        </div>`).join('')}
+        <div class="warning-card item-card keep">
+          <div class="item-title">今夜のシーンレシピ</div>
+          <p>${escapeHtml(rows.map((row) => row.resource).filter(Boolean).join(' + ') || '材料を入れる')}</p>
+        </div>
+      </div>`
+    },
     '保証書ポケット': {
       addLabel: '保証を追加する',
       sampleLabel: 'ドライヤー購入で試す',

@@ -1,11 +1,11 @@
 {
   "title": "ぐるぐる考え駐車場",
   "archetype": "parking_lot_place",
-  "interaction_model": "structured_multi_field",
-  "primary_layout": "two_column_workbench",
-  "result_presentation_style": "stacked_result_cards",
-  "palette_motif": "neutral slate / white",
-  "main_cta": "サンプルで試す",
-  "intro_variant": "generic",
-  "ui_variant": "generic"
+  "interaction_model": "editable_worry_cards_to_parking_lot",
+  "primary_layout": "worry_note_editor_with_parking_map",
+  "result_presentation_style": "tonight_action_and_parked_worries",
+  "palette_motif": "心配駐車場ナイト",
+  "main_cta": "寝る前の心配で試す",
+  "intro_variant": "worry_parking_lot",
+  "ui_variant": "worry-parking"
 }

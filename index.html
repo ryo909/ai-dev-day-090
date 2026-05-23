@@ -45,11 +45,11 @@
   .first-view__grid{grid-template-columns:1fr}
 }
 </style><link rel="stylesheet" href="/src/style.css"></head>
-<body><div id="app" data-ui-variant="generic" data-primary-layout="two_column_workbench"><section class="first-view first-view--generic" data-ready-role="first-view">
+<body><div id="app" data-ui-variant="worry-parking" data-primary-layout="worry_note_editor_with_parking_map"><section class="first-view first-view--worry-parking" data-ready-role="first-view">
   <div class="first-view__top">
     <div>
       <div class="mini-label">Day090</div>
-      <p class="first-view__eyebrow">neutral slate / white</p>
+      <p class="first-view__eyebrow">心配駐車場ナイト</p>
     </div>
     <a class="intro-link" href="https://github.com/ryo909/ai-dev-day-090" target="_blank" rel="noopener">GitHub</a>
   </div>
@@ -66,7 +66,7 @@
     </article>
     <article class="fv-block fv-block--start" data-ready-role="start-block">
       <p class="fv-kicker">最初にやること</p>
-      <h2>まず試す入力</h2>
+      <h2>心配と小さな一手を足す</h2>
       <dl class="fv-pair">
         <dt>入力 / 操作</dt>
         <dd>入力</dd>
@@ -76,7 +76,7 @@
         <dd>ここに入力...</dd>
       </dl>
       <p class="fv-helper">今夜扱う1台と明日置く枠を見る。</p>
-      <button id="sampleFillBtn" data-ready-role="primary-cta" class="primary-intro-btn" style="background:linear-gradient(135deg,var(--fv-accent),var(--fv-accent-2))">サンプルで試す</button>
+      <button id="sampleFillBtn" data-ready-role="primary-cta" class="primary-intro-btn" style="background:linear-gradient(135deg,var(--fv-accent),var(--fv-accent-2))">寝る前の心配で試す</button>
       <p class="fv-inline-note">初見なら「例で試す」から始めると、そのまま結果見本まで確認できます。</p>
     </article>
     <article class="fv-block fv-block--preview" data-ready-role="output-preview">
@@ -90,4 +90,4 @@
       </div>
     </article>
   </div>
-</section><div class="grid"><section class="panel"><h2>入れるもの</h2><input id="tokenInput" placeholder="ここに入力..."><button id="addTokenBtn">追加する</button><div id="tokenList" class="tokens"></div><hr><button id="drawBtn">引いてみる</button><button id="lockBtn">固定を切り替える</button></section><section class="panel"><h2>ここを見ればOKです</h2><div id="cardStack" class="cards"><div class="empty-state">まだ結果がありません。項目を入れるか、サンプルで試せます。</div></div><h3>さっき出た組み合わせ</h3><ul id="historyList"><li>まだ履歴がありません</li></ul></section></div></div><script type="module" src="/src/main.js"></script></body></html>
+</section><section class="brief-canvas brief-canvas--worry-parking"><div id="briefCanvas"></div></section></div><script type="module" src="/src/main.js"></script></body></html>
